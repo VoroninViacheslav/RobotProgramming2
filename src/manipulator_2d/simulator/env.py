@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import mujoco
 from importlib.resources import files
@@ -11,6 +12,9 @@ from manipulator_2d.constants import (
     MOTOR_GEARS,
     NUM_JOINTS,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def _default_model_path():
@@ -81,9 +85,12 @@ class Simulator:
         self._update_target_site()
         self._reset_sim()
 
-        print(
-            f"\n[НОВАЯ ЗАДАЧА] Объект: ({self.object_pos[0]:.2f}, {self.object_pos[1]:.2f}) "
-            f"-> Цель: ({self.goal[0]:.2f}, {self.goal[1]:.2f})"
+        logger.info(
+            "Новая задача: объект (%.2f, %.2f) -> цель (%.2f, %.2f)",
+            self.object_pos[0],
+            self.object_pos[1],
+            self.goal[0],
+            self.goal[1],
         )
         return self.get_obs()
 
@@ -132,7 +139,7 @@ class Simulator:
         dist_to_obj = np.linalg.norm(self.get_eef_pos() - self.get_object_pos())
         if dist_to_obj < GRASP_DISTANCE and not self.grasped:
             self.grasped = True
-            print("[ЗАХВАТ] Объект схвачен!")
+            logger.info("Объект схвачен")
 
     def _check_pinch_release(self):
         if not self.grasped:
@@ -147,7 +154,7 @@ class Simulator:
             or np.linalg.norm(obj_pos - link3_pos) < LINK_PINCH_DISTANCE
         ):
             self.grasped = False
-            print("[ОТПУСКАНИЕ] Объект зажат между звеньями!")
+            logger.warning("Объект зажат между звеньями — отпускание")
 
     def _sync_grasped_object(self):
         if not self.grasped:
