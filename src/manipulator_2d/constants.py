@@ -1,0 +1,49 @@
+"""Общие константы проекта."""
+
+# ZMQ
+DEFAULT_PORT = 5555
+DEFAULT_HOST = "127.0.0.1"
+ZMQ_TIMEOUT_MS = 5000
+
+# Наблюдения
+OBS_DIM = 19
+ACTION_DIM = 5
+NUM_JOINTS = 3
+
+# Индексы в векторе наблюдений
+IDX_BASE_POS = slice(0, 2)
+IDX_BASE_ROT = 2
+IDX_BASE_VEL = slice(3, 5)
+IDX_JOINT_ANGLES = slice(6, 9)
+IDX_JOINT_VEL = slice(9, 12)
+IDX_EEF_POS = slice(12, 14)
+IDX_OBJ_POS = slice(14, 16)
+IDX_GOAL = slice(16, 18)
+IDX_GRASPED = 18
+
+# Симулятор
+GRASP_DISTANCE = 0.18
+GOAL_DISTANCE = 0.05
+LINK_PINCH_DISTANCE = 0.06
+BASE_SPEED_LIMIT = 0.3
+SIM_TIMESTEP_SLEEP = 0.001
+RENDER_INIT_SLEEP = 0.3
+LOG_EVERY_N_STEPS = 20
+
+# PD-контроллер
+DEFAULT_KP = 250.0
+DEFAULT_KD = 25.0
+APPROACH_DISTANCE = 0.1
+MAX_FORCE = 700.0
+MAX_TORQUE = 200.0
+ARM_REACH = 0.45
+ARM_REACH_FACTOR = 0.7
+BASE_OFFSET = 0.2
+
+# Длины звеньев (м)
+LINK_LENGTHS = (0.18, 0.15, 0.12)
+
+# Приводы
+JOINT_NAMES = ("joint1", "joint2", "joint3")
+MOTOR_GEARS = (100.0, 80.0, 60.0)
+CTRL_LIMIT = 20.0

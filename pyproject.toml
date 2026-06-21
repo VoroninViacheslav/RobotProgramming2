@@ -1,14 +1,28 @@
-[project]
+[tool.poetry]
 name = "manipulator-2d"
 version = "0.0.1"
-description = ""
-authors = [
-    {name = "Viacheslav",email = "vslavyan17@gmail.com"}
-]
-requires-python = ">=3.11"
-dependencies = [
-]
+description = "2D манипулятор в MuJoCo с PD-контроллером"
+authors = ["Viacheslav <vslavyan17@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "manipulator_2d", from = "src" }]
 
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^2.0"
+mujoco = "^3.2"
+pyzmq = "^26.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+pytest-cov = "^6.0"
+
+[tool.poetry.scripts]
+sim = "manipulator_2d.cli:run_sim"
+control = "manipulator_2d.cli:run_control"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
