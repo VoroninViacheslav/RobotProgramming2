@@ -14,23 +14,21 @@ def _find_free_port():
         return sock.getsockname()[1]
 
 
-def test_zmq_handshake_and_exchange():
+def test_zmq_exchange_roundtrip():
     port = _find_free_port()
+    state = {
+        "obs": np.zeros(19, dtype=np.float32),
+        "eef_pos": np.zeros(2),
+        "obj_pos": np.zeros(2),
+        "goal": np.zeros(2),
+        "grasped": False,
+    }
     results = {}
 
     def run_server():
         server = ZMQServer(port=port)
         try:
-            results["handshake"] = server.wait_for_connection()
-            results["reply"] = server.exchange(
-                {
-                    "obs": np.zeros(19, dtype=np.float32),
-                    "eef_pos": np.zeros(2),
-                    "obj_pos": np.zeros(2),
-                    "goal": np.zeros(2),
-                    "grasped": False,
-                }
-            )
+            results["action"] = server.exchange(state)
         finally:
             server.close()
 
@@ -47,7 +45,7 @@ def test_zmq_handshake_and_exchange():
 
     thread.join(timeout=2)
 
-    assert "action" in results["handshake"]
-    assert results["handshake"]["action"].shape == (5,)
+    assert "action" in results["action"]
+    assert results["action"]["action"].shape == (5,)
     assert results["state"] is not None
     assert results["state"]["obs"].shape == (19,)

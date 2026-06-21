@@ -55,47 +55,40 @@ def run_sim(port=DEFAULT_PORT):
 
     try:
         while True:
-            print("[ZMQ] Ожидание первого соединения...")
-            if server.wait_for_connection() is None:
-                time.sleep(1.0)
+            action_data = server.exchange(sim.build_state(obs))
+            if action_data is None:
+                print("[ZMQ] Нет связи, повтор...")
+                time.sleep(0.5)
                 continue
 
-            print("[ZMQ] Контроллер подключен!")
+            obs, _, done, info = sim.step(action_data["action"])
+            step += 1
 
-            while True:
-                action_data = server.exchange(sim.build_state(obs))
-                if action_data is None:
-                    print("[ZMQ] Потеря связи. Переподключение...")
-                    break
-
-                obs, _, done, info = sim.step(action_data["action"])
-                step += 1
-
-                if step % LOG_EVERY_N_STEPS == 0:
-                    print(
-                        _format_status(
-                            step,
-                            sim.get_eef_pos(),
-                            sim.get_object_pos(),
-                            sim.get_goal_pos(),
-                            info["grasped"],
-                            info["distance"],
-                            base_pos=obs[0:2],
-                        )
+            if step % LOG_EVERY_N_STEPS == 0:
+                print(
+                    _format_status(
+                        step,
+                        sim.get_eef_pos(),
+                        sim.get_object_pos(),
+                        sim.get_goal_pos(),
+                        info["grasped"],
+                        info["distance"],
+                        base_pos=obs[0:2],
                     )
+                )
 
-                if done:
-                    success_count += 1
-                    print(f"\n{'=' * 50}")
-                    print(f"[✓ УСПЕХ #{success_count}] Объект доставлен! Шаг {step}")
-                    print(f"{'=' * 50}\n")
-                    obs = sim.reset()
-                    step = 0
-                    time.sleep(RENDER_INIT_SLEEP)
-                    continue
+            if done:
+                success_count += 1
+                print(f"\n{'=' * 50}")
+                print(f"[✓ УСПЕХ #{success_count}] Объект доставлен! Шаг {step}")
+                print(f"{'=' * 50}\n")
+                obs = sim.reset()
+                step = 0
+                time.sleep(RENDER_INIT_SLEEP)
+                continue
 
-                sim.render()
-                time.sleep(SIM_TIMESTEP_SLEEP)
+            sim.render()
+            time.sleep(SIM_TIMESTEP_SLEEP)
 
     except KeyboardInterrupt:
         print("\n[!] Остановлено пользователем")
